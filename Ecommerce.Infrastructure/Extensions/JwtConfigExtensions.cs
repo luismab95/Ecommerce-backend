@@ -38,13 +38,29 @@ public static class JwtConfigExtensions
                         context.Response.StatusCode = 401;
                         context.Response.ContentType = "application/json";
 
-                        var response = new 
+                        bool isExpired = context.AuthenticateFailure is SecurityTokenExpiredException;
+
+                        if (isExpired)
+                        {
+                            context.Response.StatusCode = 401;
+
+                            var response = new
+                            {
+                                data = "TOKEN_EXPIRED",
+                                message = "No autorizado. El token ha expirado.",
+                            };
+
+                            await context.Response.WriteAsJsonAsync(response);
+                            return;
+                        }
+
+                        var defaultResponse = new 
                         {
                             data = false,
                             message = "No autorizado. El token es inválido o no fue enviado.",
                         };
 
-                        await context.Response.WriteAsJsonAsync(response);
+                        await context.Response.WriteAsJsonAsync(defaultResponse);
                     },
 
                     OnForbidden = async context =>
