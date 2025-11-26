@@ -29,4 +29,11 @@ public class User
         };
     }
 
+    public static User ResetPassword(User user, string passwordHash)
+    {
+       
+        user.PasswordHash = passwordHash;
+        return user;
+    }
+
 }

@@ -35,6 +35,8 @@ builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, JwtAuthService>();
+builder.Services.AddScoped<IEmailService, GmailSmtpEmailSender>();
+
 
 // Use Cases
 builder.Services.AddScoped<SignInUseCase>();
@@ -42,7 +44,8 @@ builder.Services.AddScoped<SignUpUseCase>();
 builder.Services.AddScoped<SignOutUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
 builder.Services.AddScoped<PostAuthorizeFilter>();
-
+builder.Services.AddScoped<ResetPasswordUseCase>();
+builder.Services.AddScoped<ForgotPasswordUseCase>();
 
 // cors
 builder.Services.AddCors(options =>

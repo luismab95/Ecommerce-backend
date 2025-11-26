@@ -20,6 +20,7 @@ namespace Ecommerce.Application.UseCases.Auth
                 throw new InvalidOperationException("Sesión no encontrada.");
        
             session.IsActive = false;
+            session.LogoutAt = DateTime.UtcNow;
            
             await _sessionRepository.UpdateAsync(session);
 

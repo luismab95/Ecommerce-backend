@@ -62,7 +62,6 @@ public static class JwtConfigExtensions
 
                         await context.Response.WriteAsJsonAsync(defaultResponse);
                     },
-
                     OnForbidden = async context =>
                     {
                         context.Response.StatusCode = 403;
@@ -72,20 +71,6 @@ public static class JwtConfigExtensions
                         {
                             data = false,
                             message = "Acceso denegado. No tiene permisos suficientes.",
-                        };
-
-                        await context.Response.WriteAsJsonAsync(response);
-                    },
-
-                    OnAuthenticationFailed = async context =>
-                    {
-                        context.Response.StatusCode = 401;
-                        context.Response.ContentType = "application/json";
-
-                        var response = new
-                        {
-                            data = false,
-                            message = "No autorizado. El token es inválido o no fue enviado.",
                         };
 
                         await context.Response.WriteAsJsonAsync(response);

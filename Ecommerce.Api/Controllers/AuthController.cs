@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(SignUpUseCase signUpUseCase, SignInUseCase signInUseCase, SignOutUseCase signOutUseCase, RefreshTokenUseCase refreshTokenUseCase) : ControllerBase
+public class AuthController(SignUpUseCase signUpUseCase, SignInUseCase signInUseCase, SignOutUseCase signOutUseCase, RefreshTokenUseCase refreshTokenUseCase, ForgotPasswordUseCase forgotPasswordUseCase, ResetPasswordUseCase resetPasswordUseCase) : ControllerBase
 {
     private readonly SignUpUseCase _signUpUseCase = signUpUseCase;
     private readonly SignInUseCase _signInUseCase = signInUseCase;
     private readonly SignOutUseCase _signOutUseCase = signOutUseCase;
+    private readonly ForgotPasswordUseCase _forgotPasswordUseCase = forgotPasswordUseCase;
+    private readonly ResetPasswordUseCase _resetPasswordUseCase = resetPasswordUseCase;
     private readonly RefreshTokenUseCase _refreshTokenUseCase = refreshTokenUseCase;
 
 
@@ -102,10 +104,10 @@ public class AuthController(SignUpUseCase signUpUseCase, SignInUseCase signInUse
     }
 
 
-    [HttpDelete("sign-out")]
+    [HttpPost("sign-out")]
     [Authorize]
     [ServiceFilter(typeof(PostAuthorizeFilter))]
-    public  async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout()
     {
         try
         {
@@ -129,4 +131,57 @@ public class AuthController(SignUpUseCase signUpUseCase, SignInUseCase signInUse
             return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            var result = await _forgotPasswordUseCase.ForgotPasswordAsync(request);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" + ex.ToString() });
+        }
+    }
+
+    [HttpPost("reset-password")]
+    [Authorize]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        try
+        {
+            var rawAuth = HttpContext.Request.Headers.Authorization.ToString();
+            var token = rawAuth.Replace("Bearer ", "").Trim();
+            request.token = token;
+
+
+            var result = await _resetPasswordUseCase.ResetPasswordAsync(request);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+        }
+    }
+
 }

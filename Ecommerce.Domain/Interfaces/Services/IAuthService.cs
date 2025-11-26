@@ -8,6 +8,7 @@ public interface IAuthService
     bool ValidateToken(string token, bool validateLifetime);
     Task<string> GenerateTokenAsync(User user, int sessionId);
     Task<string> GenerateRefreshTokenAsync(User user);
+    Task<string> GenerateResetPasswordTokenAsync(User user);
     string HashPassword(string password);
     bool VerifyPassword(string password, string passwordHash);
 }

@@ -59,6 +59,29 @@ public class JwtAuthService(IOptions<JwtSettings> jwtSettings) : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public async Task<string> GenerateResetPasswordTokenAsync(User user)
+    {
+        var claims = new[]
+         {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.GivenName, user.FirstName),
+            new Claim(ClaimTypes.Surname, user.LastName)
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(_jwtSettings.ResetPasswordExpireMinutes),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
     public bool ValidateToken(string token, bool validateLifetime)
     {
 
@@ -95,7 +118,6 @@ public class JwtAuthService(IOptions<JwtSettings> jwtSettings) : IAuthService
             return false;
         }
     }
-
 
     public async Task<IDictionary<string, object>> GetPayloadJwtTokenAsync(string token)
     {
