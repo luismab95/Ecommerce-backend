@@ -1,8 +1,11 @@
+﻿using Ecommerce.Api.Configurations;
+using Ecommerce.Api.Filters;
 using Ecommerce.Application.UseCases.Auth;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Data.Configurations;
+using Ecommerce.Infrastructure.Extensions;
 using Ecommerce.Infrastructure.Repositories;
 using Ecommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +19,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+builder.Services.AddAuthorization();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Configurar JWT
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -27,12 +31,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, JwtAuthService>();
 
 // Use Cases
-builder.Services.AddScoped<RegisterUserUseCase>();
+builder.Services.AddScoped<SignInUseCase>();
+builder.Services.AddScoped<SignUpUseCase>();
+builder.Services.AddScoped<SignOutUseCase>();
+builder.Services.AddScoped<RefreshTokenUseCase>();
+builder.Services.AddScoped<PostAuthorizeFilter>();
+
 
 // cors
 builder.Services.AddCors(options =>
@@ -43,9 +53,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCustomInvalidModelStateResponse();
 
 
 var app = builder.Build();
+
+// Middleware
+//app.UseMiddleware<ValidationErrorHandlerMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -54,8 +68,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseCors("NewPolicy");
+
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
