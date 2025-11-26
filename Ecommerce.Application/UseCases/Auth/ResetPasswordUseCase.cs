@@ -1,9 +1,9 @@
 ﻿
 
 using Ecommerce.Application.DTOs.Auth;
-using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
+using Ecommerce.Domain.Entities;
 using System.Security.Claims;
 
 namespace Ecommerce.Application.UseCases.Auth;
@@ -31,6 +31,7 @@ public class ResetPasswordUseCase(IAuthService authService, IUserRepository user
         // actualizar usuario
         var hashPassword = _authService.HashPassword(request.Password);
         var user = User.ResetPassword(findUser, hashPassword);
+   
         await _userRepository.UpdateAsync(user);
 
         return "Tu contraseña ha sido restablecida con éxito.";

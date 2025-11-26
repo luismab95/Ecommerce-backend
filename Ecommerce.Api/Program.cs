@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Api.Configurations;
 using Ecommerce.Api.Filters;
 using Ecommerce.Application.UseCases.Auth;
+using Ecommerce.Application.UseCases.Users;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using Ecommerce.Infrastructure.Data;
@@ -43,9 +44,14 @@ builder.Services.AddScoped<SignInUseCase>();
 builder.Services.AddScoped<SignUpUseCase>();
 builder.Services.AddScoped<SignOutUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
-builder.Services.AddScoped<PostAuthorizeFilter>();
 builder.Services.AddScoped<ResetPasswordUseCase>();
 builder.Services.AddScoped<ForgotPasswordUseCase>();
+builder.Services.AddScoped<UserUseCase>();
+
+
+// Filters
+builder.Services.AddScoped<PostAuthorizeFilter>();
+builder.Services.AddScoped<PostAuthorizeRoleFilter>();
 
 // cors
 builder.Services.AddCors(options =>
@@ -61,8 +67,6 @@ builder.Services.AddCustomInvalidModelStateResponse();
 
 var app = builder.Build();
 
-// Middleware
-//app.UseMiddleware<ValidationErrorHandlerMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
