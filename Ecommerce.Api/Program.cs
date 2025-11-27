@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Api.Configurations;
 using Ecommerce.Api.Filters;
 using Ecommerce.Application.UseCases.Auth;
+using Ecommerce.Application.UseCases.Categories;
 using Ecommerce.Application.UseCases.Users;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
@@ -10,6 +11,7 @@ using Ecommerce.Infrastructure.Extensions;
 using Ecommerce.Infrastructure.Repositories;
 using Ecommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingrese el token JWT"
+    });
+    c.OperationFilter<SwaggerAuthorizeOperationFilter>();
+});
+
 
 builder.Services.AddAuthorization();
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -33,6 +48,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, JwtAuthService>();
@@ -46,7 +62,8 @@ builder.Services.AddScoped<SignOutUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
 builder.Services.AddScoped<ResetPasswordUseCase>();
 builder.Services.AddScoped<ForgotPasswordUseCase>();
-builder.Services.AddScoped<UserUseCase>();
+builder.Services.AddScoped<UserUseCases>();
+builder.Services.AddScoped<CategoryUseCases>();
 
 
 // Filters

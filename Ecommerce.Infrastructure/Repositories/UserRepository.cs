@@ -14,7 +14,7 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
     }
 
     public async Task<PaginationResponse<User>> GetUsersAsync(int pageSize, int pageNumber, string? searchTerm)
@@ -40,7 +40,7 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
   
     public async Task<User?> GetByIdAsync(int userId)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
     }
 
     public async Task AddAsync(User user)
@@ -52,7 +52,7 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
     public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await _context.Users
-            .AnyAsync(u => u.Email == email);
+            .AnyAsync(u => u.Email == email && u.IsActive);
     }
 
     public async Task UpdateAsync(User user)

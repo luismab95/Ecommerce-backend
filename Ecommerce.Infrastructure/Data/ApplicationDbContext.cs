@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Session> Sessions { get; set; }
+    public DbSet<Category> Categories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +39,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasKey(s => s.Id);
             entity.HasIndex(s => s.UserId);
             entity.HasIndex(s => new { s.UserId, s.IsActive });
+            entity.Property(s => s.Id).ValueGeneratedOnAdd();
             entity.Property(s => s.DeviceInfo).HasMaxLength(500);
             entity.Property(s => s.IpAddress).HasMaxLength(45);
             entity.Property(s => s.RefreshToken).IsRequired();
@@ -51,6 +53,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                   .WithMany(u => u.Sessions)
                   .HasForeignKey(s => s.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Category configuration
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id).ValueGeneratedOnAdd();
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.Description).IsRequired().HasMaxLength(255);
+            entity.Property(c => c.IsActive).HasDefaultValue(true);
+            entity.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(c => c.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
         });
     }
 }

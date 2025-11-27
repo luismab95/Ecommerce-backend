@@ -1,15 +1,13 @@
-﻿using Ecommerce.Application.DTOs.Auth;
-using Ecommerce.Application.DTOs.General;
+﻿using Ecommerce.Application.DTOs.General;
 using Ecommerce.Application.DTOs.Users;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces.Repositories;
 
 namespace Ecommerce.Application.UseCases.Users;
 
-public class UserUseCase(IUserRepository userRepository)
+public class UserUseCases(IUserRepository userRepository)
 {
     private readonly IUserRepository _userRepository = userRepository;
-
 
     public async Task<object> GetUserByIdAsync(int userId)
     {
@@ -68,6 +66,11 @@ public class UserUseCase(IUserRepository userRepository)
     {
         var findUser = await _userRepository.GetByIdAsync(userId) ??
             throw new InvalidOperationException("Usuario no encontrado.");
+
+        if(findUser.Role != "Cliente")
+        {
+            throw new InvalidOperationException("No se puede eliminar a un Usuario administrador.");
+        }
 
         var updateUser = User.Delete(findUser);
         await _userRepository.UpdateAsync(updateUser);

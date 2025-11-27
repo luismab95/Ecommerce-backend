@@ -1,28 +1,27 @@
-﻿using Ecommerce.Api.Filters;
+﻿namespace Ecommerce.Api.Controllers;
+
+using Ecommerce.Api.Filters;
+using Ecommerce.Application.DTOs.Categories;
 using Ecommerce.Application.DTOs.General;
-using Ecommerce.Application.DTOs.Users;
-using Ecommerce.Application.UseCases.Users;
+using Ecommerce.Application.UseCases.Categories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-namespace Ecommerce.Api.Controllers;
 
 
 [ApiController]
 [Authorize]
 [ServiceFilter(typeof(PostAuthorizeFilter))]
-[Route("api/users")]
-public class UserController(UserUseCases userUseCase) : ControllerBase
+[Route("api/categories")]
+public class CategoryController(CategoryUseCases categoryUseCases) : ControllerBase
 {
-    private readonly UserUseCases _userUseCase = userUseCase;
-
+    private readonly CategoryUseCases _categoryUseCases = categoryUseCases;
 
     [HttpGet("")]
-    public async Task<IActionResult> GetUsers([FromQuery] GeneralPaginationRequest request)
+    public async Task<IActionResult> GetCategories([FromQuery] GeneralPaginationRequest request)
     {
         try
         {
-            var result = await _userUseCase.GetUsersAsync(request);
+            var result = await _categoryUseCases.GetCategoriesAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -40,13 +39,12 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
         }
     }
 
-
-    [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserById(int userId)
+    [HttpGet("{categoryId}")]
+    public async Task<IActionResult> GetCategoryById(int categoryId)
     {
         try
         {
-            var result = await _userUseCase.GetUserByIdAsync(userId);
+            var result = await _categoryUseCases.GetCategoryByIdAsync(categoryId);
 
             return Ok(new GeneralResponse
             {
@@ -64,37 +62,13 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
         }
     }
 
-
-    [HttpPut("/profile/{userId}")]
-    public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserRequest request)
-    {
-        try
-        {
-            var result = await _userUseCase.UpdateUserAsync(userId, request);
-
-            return Ok(new GeneralResponse
-            {
-                Data = result,
-                Message = "Proceso realizado con éxito."
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new GeneralResponse { Message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
-        }
-    }
-
-    [HttpPut("/role/{userId}")]
+    [HttpPost("")]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> UpdateUserRole(int userId)
+    public async Task<IActionResult> AddCategory([FromBody] CategoryRequest request)
     {
         try
         {
-            var result = await _userUseCase.UpdateRoleAsync(userId);
+            var result = await _categoryUseCases.AddCategoryAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -113,13 +87,39 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
     }
 
 
-    [HttpDelete("{userId}")]
+
+    [HttpPut("{categoryId}")]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> DeleteUser(int userId)
+    public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody] CategoryRequest request)
     {
         try
         {
-            var result = await _userUseCase.DeleteUserAsync(userId);
+            var result = await _categoryUseCases.UpdateCategoryAsync(categoryId, request);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+        }
+    }
+
+
+    [HttpDelete("{categoryId}")]
+    [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
+    public async Task<IActionResult> DeleteCategory(int categoryId)
+    {
+        try
+        {
+            var result = await _categoryUseCases.DeleteCategoryAsync(categoryId);
 
             return Ok(new GeneralResponse
             {
@@ -138,3 +138,4 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
     }
 
 }
+
