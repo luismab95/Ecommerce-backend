@@ -9,6 +9,7 @@ public class Category
     public DateTime CreatedAt { get; private set; } = DateTime.Now;
     public DateTime UpdatedAt { get; private set; }
 
+    public virtual Product? Product { get; private set; }
 
     private Category() { }
 

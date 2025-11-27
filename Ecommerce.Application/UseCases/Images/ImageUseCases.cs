@@ -10,19 +10,19 @@ public class ImageUseCases(IImageRepository imageRepository, IUploadImageService
     private readonly IImageRepository _imageRepository = imageRepository;
     private readonly IUploadImageService _uploadImageService = uploadImageService;
 
-
-    public async Task<string> AddImagesAsync(IFormFileCollection request)
+    public async Task<string> AddImagesAsync(IFormFileCollection request , int productId)
     {
 
+        //TODO VALDIAR PRODUCTO EXISTA
         var images = await _uploadImageService.AddImageAsync(request);
 
         foreach (var item in images)
         {
-            var newImage = Image.Create(item, 1);
+            var newImage = Image.Create(item, productId);
             await _imageRepository.AddAsync(newImage);
         }
 
-        return "Imágenes agregadas exitosamente.";
+        return "Imágen(s) agregadas exitosamente.";
     }
 
     public async Task<string> DeleteImageAsync(int imageId)

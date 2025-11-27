@@ -1,25 +1,25 @@
-﻿namespace Ecommerce.Api.Controllers;
-
-using Ecommerce.Api.Filters;
-using Ecommerce.Application.DTOs.Categories;
+﻿using Ecommerce.Api.Filters;
 using Ecommerce.Application.DTOs.General;
-using Ecommerce.Application.UseCases.Categories;
+using Ecommerce.Application.DTOs.Products;
+using Ecommerce.Application.UseCases.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Ecommerce.Api.Controllers;
 
 [ApiController]
-[Route("api/categories")]
-public class CategoryController(CategoryUseCases categoryUseCases) : ControllerBase
+[Route("api/products")]
+public class ProductController(ProductUseCases productUseCases) : ControllerBase
 {
-    private readonly CategoryUseCases _categoryUseCases = categoryUseCases;
+    private readonly ProductUseCases _productUseCases = productUseCases;
+
 
     [HttpGet("")]
-    public async Task<IActionResult> GetCategories([FromQuery] GeneralPaginationRequest request)
+    public async Task<IActionResult> GetCategories([FromQuery] GetProductsWithFiltersRequest request)
     {
         try
         {
-            var result = await _categoryUseCases.GetCategoriesAsync(request);
+            var result = await _productUseCases.GetProductsAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -37,12 +37,12 @@ public class CategoryController(CategoryUseCases categoryUseCases) : ControllerB
         }
     }
 
-    [HttpGet("{categoryId}")]
-    public async Task<IActionResult> GetCategoryById(int categoryId)
+    [HttpGet("{productId}")]
+    public async Task<IActionResult> GetCategoryById(int productId)
     {
         try
         {
-            var result = await _categoryUseCases.GetCategoryByIdAsync(categoryId);
+            var result = await _productUseCases.GetProductByIdAsync(productId);
 
             return Ok(new GeneralResponse
             {
@@ -59,16 +59,17 @@ public class CategoryController(CategoryUseCases categoryUseCases) : ControllerB
             return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
         }
     }
+
 
     [HttpPost("")]
     [Authorize]
     [ServiceFilter(typeof(PostAuthorizeFilter))]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> AddCategory([FromBody] CategoryRequest request)
+    public async Task<IActionResult> AddProduct([FromBody] ProductRequest request)
     {
         try
         {
-            var result = await _categoryUseCases.AddCategoryAsync(request);
+            var result = await _productUseCases.AddProductAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -86,17 +87,15 @@ public class CategoryController(CategoryUseCases categoryUseCases) : ControllerB
         }
     }
 
-
-
-    [HttpPut("{categoryId}")]
+    [HttpPut("{productId}")]
     [Authorize]
     [ServiceFilter(typeof(PostAuthorizeFilter))]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> UpdateCategory(int categoryId, [FromBody] CategoryRequest request)
+    public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductRequest request)
     {
         try
         {
-            var result = await _categoryUseCases.UpdateCategoryAsync(categoryId, request);
+            var result = await _productUseCases.UpdateProductAsync(productId, request);
 
             return Ok(new GeneralResponse
             {
@@ -115,15 +114,15 @@ public class CategoryController(CategoryUseCases categoryUseCases) : ControllerB
     }
 
 
-    [HttpDelete("{categoryId}")]
+    [HttpDelete("{productId}")]
     [Authorize]
     [ServiceFilter(typeof(PostAuthorizeFilter))]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> DeleteCategory(int categoryId)
+    public async Task<IActionResult> DeleteCategory(int productId)
     {
         try
         {
-            var result = await _categoryUseCases.DeleteCategoryAsync(categoryId);
+            var result = await _productUseCases.DeleteProductAsync(productId);
 
             return Ok(new GeneralResponse
             {
@@ -140,6 +139,7 @@ public class CategoryController(CategoryUseCases categoryUseCases) : ControllerB
             return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
         }
     }
+
+
 
 }
-

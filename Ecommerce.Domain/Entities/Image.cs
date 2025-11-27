@@ -9,6 +9,10 @@ public class Image
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
+
+    // Propiedad de navegación para la relación con Product
+    public virtual Product? Product { get; private set; }
+
     private Image() { }
 
     public static Image Create(string path, int productId)
@@ -26,5 +30,17 @@ public class Image
     {
         image.IsActive = false;
         return image;
+    }
+
+
+    public static object ToSafeResponse(Image image)
+    {
+        return new
+        {
+            image.Id,
+            image.Path,
+            CreatedAt = image.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+            UpdatedAt = image.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+        };
     }
 }

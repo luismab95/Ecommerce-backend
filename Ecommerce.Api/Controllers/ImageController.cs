@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
 
-
 [ApiController]
-
 [Route("api/images")]
 public class ImageController(ImageUseCases imageUseCases, IWebHostEnvironment environment ) : ControllerBase
 {
@@ -43,16 +41,16 @@ public class ImageController(ImageUseCases imageUseCases, IWebHostEnvironment en
 
     }
 
-    [HttpPost("")]
+    [HttpPost("{productId}")]
     [Consumes("multipart/form-data")]
     [Authorize]
     [ServiceFilter(typeof(PostAuthorizeFilter))]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> AddImages([FromForm] IFormFileCollection request)
+    public async Task<IActionResult> AddImages([FromForm] IFormFileCollection request, int productId)
     {
         try
         {
-            var result = await _imageUseCases.AddImagesAsync(request);
+            var result = await _imageUseCases.AddImagesAsync(request, productId);
 
             return Ok(new GeneralResponse
             {
