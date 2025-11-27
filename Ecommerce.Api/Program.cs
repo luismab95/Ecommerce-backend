@@ -3,6 +3,7 @@ using Ecommerce.Api.Filters;
 using Ecommerce.Application.UseCases.Auth;
 using Ecommerce.Application.UseCases.Categories;
 using Ecommerce.Application.UseCases.Users;
+using Ecommerce.Application.UseCases.Images;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using Ecommerce.Infrastructure.Data;
@@ -49,10 +50,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, JwtAuthService>();
 builder.Services.AddScoped<IEmailService, GmailSmtpEmailSender>();
+builder.Services.AddScoped<IUploadImageService, LocalStorageImageService>();
 
 
 // Use Cases
@@ -64,6 +67,7 @@ builder.Services.AddScoped<ResetPasswordUseCase>();
 builder.Services.AddScoped<ForgotPasswordUseCase>();
 builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<CategoryUseCases>();
+builder.Services.AddScoped<ImageUseCases>();
 
 
 // Filters
@@ -93,6 +97,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("NewPolicy");
+
+app.UseStaticFiles();
 
 app.UseAuthentication(); 
 app.UseAuthorization();

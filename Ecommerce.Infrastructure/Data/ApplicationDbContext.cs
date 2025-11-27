@@ -9,6 +9,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<User> Users { get; set; }
     public DbSet<Session> Sessions { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Image> Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,5 +67,26 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
             entity.Property(c => c.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
         });
+
+        // Category configuration
+        modelBuilder.Entity<Image>(entity =>
+        {
+            entity.HasKey(i => i.Id);
+            entity.HasIndex(i => i.ProductId);
+            entity.HasIndex(i => new { i.ProductId, i.IsActive });
+            entity.Property(i => i.Id).ValueGeneratedOnAdd();
+            entity.Property(i => i.Path).IsRequired();
+            entity.Property(i => i.IsActive).HasDefaultValue(true);
+            entity.Property(i => i.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(i => i.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
+
+            // Relationships
+            //entity.HasOne(s => s.User)
+            //      .WithMany(u => u.Sessions)
+            //      .HasForeignKey(i => i.ProductId)
+            //      .OnDelete(DeleteBehavior.Cascade);
+        });
+
+
     }
 }
