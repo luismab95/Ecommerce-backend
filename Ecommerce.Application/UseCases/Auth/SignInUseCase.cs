@@ -39,7 +39,7 @@ public class SignInUseCase(IUserRepository userRepository, ISessionRepository se
         return new AuthResponse
         {
             AccessToken = accessToken,
-            RefreshToken = refreshToken
+            User = User.ToSafeResponse(findUser)
         };
     }
 

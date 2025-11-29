@@ -5,7 +5,7 @@ namespace Ecommerce.Application.DTOs.General;
 public class GeneralPaginationRequest
 {
     [Required(ErrorMessage = "El tamaño de la página es requerido")]
-    [Range(1, 100, ErrorMessage = "El tamaño de página debe estar entre 1 y 100")]
+    [Range(5, int.MaxValue, ErrorMessage = "El tamaño de página debe ser mayor a 5")]
     public int PageSize { get; set; } = 10;
 
     [Required(ErrorMessage = "El número de página es requerido")]

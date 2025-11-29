@@ -25,6 +25,13 @@ public class Image
         };
     }
 
+    public static Image UpdatePath(Image image, string baseUrl)
+    {
+        image.Path = baseUrl + image.Path;
+        return image;
+
+    }
+
 
     public static Image Delete(Image image)
     {

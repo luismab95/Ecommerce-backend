@@ -1,9 +1,11 @@
-﻿using Ecommerce.Domain.DTOs.Pagination;
+﻿using Azure.Core;
+using Ecommerce.Domain.DTOs.Pagination;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Image = Ecommerce.Domain.Entities.Image;
 
 namespace Ecommerce.Infrastructure.Repositories;
 
@@ -68,7 +70,9 @@ public class ProductRepository(ApplicationDbContext context) : IProductRepositor
 
         query = query.OrderBy(p => p.Id);
 
+       
         return await query.ToPagedListAsync(pageNumber, pageSize);
+
     }
 
     public async Task UpdateAsync(Product product)

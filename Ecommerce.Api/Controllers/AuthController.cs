@@ -163,7 +163,7 @@ public class AuthController(SignUpUseCase signUpUseCase, SignInUseCase signInUse
         {
             var rawAuth = HttpContext.Request.Headers.Authorization.ToString();
             var token = rawAuth.Replace("Bearer ", "").Trim();
-            request.token = token;
+            request.Token = token;
 
 
             var result = await _resetPasswordUseCase.ResetPasswordAsync(request);

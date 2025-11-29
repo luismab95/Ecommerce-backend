@@ -1,12 +1,14 @@
 ﻿using Ecommerce.Application.DTOs.Products;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace Ecommerce.Application.UseCases.Products;
 
-public class ProductUseCases(IProductRepository productRepository)
+public class ProductUseCases(IProductRepository productRepository, IConfiguration config)
 {
     private readonly IProductRepository _productRepository = productRepository;
+    private readonly IConfiguration _config = config;
 
 
     public async Task<object> GetProductsAsync(GetProductsWithFiltersRequest request)
@@ -14,10 +16,20 @@ public class ProductUseCases(IProductRepository productRepository)
         var result = await _productRepository.GetProductsAsync(request.PageSize, request.PageNumber, request.SearchTerm, request.CategoryId, request.PriceMax, request.PriceMin,request.Featured);
 
         var safeProductResponse = new List<object>();
+ 
         result.Items.ForEach(product =>
         {
             safeProductResponse.Add(Product.ToSafeResponse(product));
+            if (product != null && product.Images != null)
+            {
+                string baseUrl = $"{_config["App:StaticUrl"]}";
+                product.Images.ForEach(image =>
+                {
+                    image = Image.UpdatePath(image, baseUrl);
+                });
+            }
         });
+
 
         return new
         {
@@ -36,7 +48,15 @@ public class ProductUseCases(IProductRepository productRepository)
         var findProduct = await _productRepository.GetByIdAsync(productId) ??
             throw new InvalidOperationException("Producto no encontrado.");
 
-        return Product.ToSafeResponse(findProduct);
+        if (findProduct != null && findProduct.Images != null)
+        {
+            string baseUrl = $"{_config["App:StaticUrl"]}";
+            findProduct.Images.ForEach(image => {
+                image = Image.UpdatePath(image, baseUrl);
+            });
+        }
+
+        return Product.ToSafeResponse(findProduct!);
     }
 
     public async Task<string> AddProductAsync(ProductRequest request)

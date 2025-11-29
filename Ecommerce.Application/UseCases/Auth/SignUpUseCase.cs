@@ -28,7 +28,7 @@ public class SignUpUseCase(IUserRepository userRepository, IAuthService authServ
         // Guardar usuario
         await _userRepository.AddAsync(user);
 
-        return "¡Bienvenido! Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.";
+        return "¡Bienvenido! Tu cuenta ha sido creada correctamente.";
     }
 
 }

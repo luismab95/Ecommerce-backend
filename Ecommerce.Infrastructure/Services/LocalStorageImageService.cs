@@ -12,7 +12,7 @@ public class LocalStorageImageService: IUploadImageService
 
         // Configuración
         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".jfif", ".avif" };
         var maxFileSize = 5 * 1024 * 1024; // 5MB
 
         // Crear directorio si no existe
@@ -28,11 +28,11 @@ public class LocalStorageImageService: IUploadImageService
                 continue;
 
             if (formFile.Length > maxFileSize)
-                throw new ArgumentException($"Archivo demasiado grande: {formFile.FileName}");
+                throw new InvalidOperationException($"Archivo demasiado grande: {formFile.FileName}");
 
             var extension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(extension))
-                throw new ArgumentException($"Tipo de archivo no permitido: {extension}");
+                throw new InvalidOperationException($"Tipo de archivo no permitido: {extension}");
 
             // Generar nombre único
             var fileName = $"{Guid.NewGuid()}{extension}";

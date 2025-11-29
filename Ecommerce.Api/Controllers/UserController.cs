@@ -18,6 +18,7 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
 
 
     [HttpGet("")]
+    [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
     public async Task<IActionResult> GetUsers([FromQuery] GeneralPaginationRequest request)
     {
         try
@@ -65,7 +66,7 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
     }
 
 
-    [HttpPut("/profile/{userId}")]
+    [HttpPut("profile/{userId}")]
     public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserRequest request)
     {
         try
@@ -88,7 +89,7 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
         }
     }
 
-    [HttpPut("/role/{userId}")]
+    [HttpPut("role/{userId}")]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
     public async Task<IActionResult> UpdateUserRole(int userId)
     {

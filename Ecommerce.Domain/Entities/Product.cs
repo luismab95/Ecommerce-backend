@@ -14,7 +14,7 @@ public class Product
     public DateTime CreatedAt { get; private set; } = DateTime.Now;
     public DateTime UpdatedAt { get; private set; }
 
-    public virtual Category? Category { get; private set; }
+    public virtual Category? Category { get; set; }
 
     private Product() { }
 

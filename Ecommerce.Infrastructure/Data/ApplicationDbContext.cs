@@ -70,6 +70,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(c => c.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
             entity.Property(c => c.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
 
+            entity.HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Índices
             entity.HasIndex(c => c.Name).IsUnique();
             entity.HasIndex(c => c.IsActive);
@@ -112,11 +117,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(p => p.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
             entity.Property(p => p.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
 
-            // Relación 1 a 1 con Category
+            // Relación 1 a varios con Category
             entity.HasOne(p => p.Category)
-                  .WithOne(c => c.Product)
-                  .HasForeignKey<Product>(p => p.CategoryId)
-                  .OnDelete(DeleteBehavior.Restrict);
+             .WithMany(c => c.Products)
+             .HasForeignKey(p => p.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict);
 
             // Índices
             entity.HasIndex(p => p.Name);

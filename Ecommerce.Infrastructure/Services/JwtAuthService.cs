@@ -66,7 +66,8 @@ public class JwtAuthService(IOptions<JwtSettings> jwtSettings) : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.GivenName, user.FirstName),
-            new Claim(ClaimTypes.Surname, user.LastName)
+            new Claim(ClaimTypes.Surname, user.LastName),
+            new Claim(ClaimTypes.Role, "RESET_PASSWORD")
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
@@ -124,7 +125,7 @@ public class JwtAuthService(IOptions<JwtSettings> jwtSettings) : IAuthService
         var handler = new JwtSecurityTokenHandler();
 
         if (!handler.CanReadToken(token))
-            throw new ArgumentException("Token inválido o con formato incorrecto.");
+            throw new InvalidOperationException("Token inválido o con formato incorrecto.");
 
         var jwt = handler.ReadJwtToken(token);
 

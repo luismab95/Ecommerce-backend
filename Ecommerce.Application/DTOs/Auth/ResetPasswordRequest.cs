@@ -17,6 +17,6 @@ public class ResetPasswordRequest
     public string Password { get; set; } = string.Empty;
 
     [JsonIgnore]
-    public string token { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
 
 }

@@ -23,13 +23,11 @@ public class ForgotPasswordUseCase(IAuthService authService, IUserRepository use
         var findUser = await _userRepository.GetByEmailAsync(request.Email) ??
             throw new InvalidOperationException("El usuario no esta registrado.");
         
-        var accessToken = await _authService.GenerateResetPasswordTokenAsync(findUser);
+        var  resetPwdAccessToken = await _authService.GenerateResetPasswordTokenAsync(findUser);
 
-        //todo enviar mail
-        var resetLink = $"{_config["App:FrontendBaseUrl"]}/reset-password?token={accessToken}";
         var msg = new EmailMessage
         {
-            Body = GetPasswordResetTemplate(resetLink),
+            Body = GetPasswordResetTemplate(),
             From = _config["Gmail:Username"]!,
             IsHtml = true,
             Subject = "Restablecer tu contraseña",
@@ -38,20 +36,20 @@ public class ForgotPasswordUseCase(IAuthService authService, IUserRepository use
 
         await _emailService.SendAsync(msg);
 
-        return "Hemos enviado un correo electrónico con un enlace para restablecer su contraseña.";
+        return resetPwdAccessToken;
 
     }
 
-    public static string GetPasswordResetTemplate(string resetLink)
+    public static string GetPasswordResetTemplate()
     {
         return $@" <div style='font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 20px;'> <h2 style='color:#333;'>Restablecer tu contraseña</h2> <p style='color:#555; font-size: 15px;'>
-                    Has solicitado restablecer tu contraseña. Haz clic en el botón de abajo para continuar. </p>
+                    Has solicitado restablecer tu contraseña. </p>
 
                     <div style='text-align: center; margin: 30px 0;'>
-                        <a href='{resetLink}' 
+                        <a 
                            style='background: #4a90e2; color: white; padding: 12px 20px; 
                                   border-radius: 6px; text-decoration: none; font-size: 16px;'>
-                            Restablecer contraseña
+                            Tienes 10 minutos para realizar el cambio.
                         </a>
                     </div>
 

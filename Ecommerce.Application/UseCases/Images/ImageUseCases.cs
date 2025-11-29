@@ -5,20 +5,21 @@ using Ecommerce.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Image = Ecommerce.Domain.Entities.Image;
 
-public class ImageUseCases(IImageRepository imageRepository, IUploadImageService uploadImageService)
+public class ImageUseCases(IImageRepository imageRepository, IUploadImageService uploadImageService, IProductRepository productRepository)
 {
     private readonly IImageRepository _imageRepository = imageRepository;
+    private readonly IProductRepository _productRepository = productRepository;
     private readonly IUploadImageService _uploadImageService = uploadImageService;
 
     public async Task<string> AddImagesAsync(IFormFileCollection request , int productId)
     {
+        var findProduct = await _productRepository.GetByIdAsync(productId) ?? throw  new InvalidOperationException("Producto no encontrado.");
 
-        //TODO VALDIAR PRODUCTO EXISTA
         var images = await _uploadImageService.AddImageAsync(request);
 
         foreach (var item in images)
         {
-            var newImage = Image.Create(item, productId);
+            var newImage = Image.Create(item, findProduct.Id);
             await _imageRepository.AddAsync(newImage);
         }
 

@@ -64,7 +64,7 @@ public class ImageController(ImageUseCases imageUseCases, IWebHostEnvironment en
         }
         catch (Exception)
         {
-            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor"});
         }
     }
 
