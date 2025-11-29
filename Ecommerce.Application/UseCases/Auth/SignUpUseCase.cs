@@ -5,13 +5,13 @@ using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using Ecommerce.Application.DTOs.Auth;
 
-public class RegisterUserUseCase(IUserRepository userRepository, IAuthService authService)
+public class SignUpUseCase(IUserRepository userRepository, IAuthService authService)
 {
 
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IAuthService _authService = authService;
 
-    public async Task<String> RegisterUserAsync(RegisterRequest request)
+    public async Task<String> RegisterUserAsync(SignUpRequest request)
     {
         // Validar que el email no exista
         if (await _userRepository.ExistsByEmailAsync(request.Email))
@@ -28,7 +28,7 @@ public class RegisterUserUseCase(IUserRepository userRepository, IAuthService au
         // Guardar usuario
         await _userRepository.AddAsync(user);
 
-        return "¡Bienvenido! Tu cuenta ha sido creada correctamente. Ya puedes iniciar sesión.";
+        return "¡Bienvenido! Tu cuenta ha sido creada correctamente.";
     }
 
 }

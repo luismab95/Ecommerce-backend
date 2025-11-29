@@ -1,8 +1,11 @@
-﻿namespace Ecommerce.Application.DTOs.Auth;
+﻿using Ecommerce.Domain.Entities;
+
+namespace Ecommerce.Application.DTOs.Auth;
 
 public class AuthResponse
 {
-    public string Token { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
+    public required object User { get; set; }
 
 }
 

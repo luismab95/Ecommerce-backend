@@ -4,13 +4,17 @@ namespace Ecommerce.Domain.Entities;
 public class User
 {
 
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }
     public string Email { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string Role { get; private set; } = string.Empty;
+    public bool IsActive { get; private set; } = true;
     public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+
+    public virtual ICollection<Session>? Sessions { get; set; }
 
     private User() { }
 
@@ -18,14 +22,54 @@ public class User
     {
         return new User
         {
-            Id = Guid.NewGuid(),
             Email = email,
             PasswordHash = passwordHash,
             FirstName = firstName,
             LastName = lastName,
             Role = "Cliente",
-            CreatedAt = DateTime.UtcNow
+            IsActive = true
         };
+    }
+
+    public static User UpdateNames(User user, string firstName, string lastName)
+    {
+        user.FirstName = firstName;
+        user.LastName = lastName;
+        return user;
+    }
+
+    public static User UpdateRole(User user)
+    {
+        user.Role = user.Role == "Cliente" ? "Administrador" : "Cliente";
+        return user;
+    }
+
+    public static User Delete(User user)
+    {
+        user.IsActive = false;
+        return user;
+    }
+
+    public static object ToSafeResponse(User user)
+    {
+        return new 
+        {
+            user.Id,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            user.Role,
+            user.IsActive,
+            CreatedAt = user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+            UpdatedAt = user.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+        };
+    }
+
+    public static User ResetPassword(User user, string passwordHash)
+    {
+       
+        user.PasswordHash = passwordHash;
+        return user;
     }
 
 }
