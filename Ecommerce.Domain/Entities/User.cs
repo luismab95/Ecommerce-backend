@@ -31,10 +31,11 @@ public class User
         };
     }
 
-    public static User UpdateNames(User user, string firstName, string lastName)
+    public static User UpdateNames(User user, string firstName, string lastName,string email)
     {
         user.FirstName = firstName;
         user.LastName = lastName;
+        user.Email = email;
         return user;
     }
 

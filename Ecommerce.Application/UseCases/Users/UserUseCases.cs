@@ -44,7 +44,7 @@ public class UserUseCases(IUserRepository userRepository)
         var findUser = await _userRepository.GetByIdAsync(userId) ??
             throw new InvalidOperationException("Usuario no encontrado.");
 
-        var updateUser = User.UpdateNames(findUser,user.FirstName, user.LastName);
+        var updateUser = User.UpdateNames(findUser,user.FirstName, user.LastName, user.Email);
         await _userRepository.UpdateAsync(updateUser);
 
         return "Usuario actualizado exitosamente.";
