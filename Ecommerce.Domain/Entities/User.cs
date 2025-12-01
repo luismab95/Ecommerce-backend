@@ -1,4 +1,7 @@
 ﻿
+using Microsoft.AspNetCore.Http.Internal;
+using System.Net;
+
 namespace Ecommerce.Domain.Entities;
 
 public class User
@@ -14,7 +17,11 @@ public class User
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
+    public virtual ICollection<WishList>? WishLists { get; private set; }
+
     public virtual ICollection<Session>? Sessions { get; set; }
+    public virtual UserAddress? UserAddress { get; private set; }
+
 
     private User() { }
 
@@ -31,7 +38,7 @@ public class User
         };
     }
 
-    public static User UpdateNames(User user, string firstName, string lastName,string email)
+    public static User UpdateNames(User user, string firstName, string lastName, string email)
     {
         user.FirstName = firstName;
         user.LastName = lastName;
@@ -53,7 +60,7 @@ public class User
 
     public static object ToSafeResponse(User user)
     {
-        return new 
+        return new
         {
             user.Id,
             user.Email,
@@ -61,6 +68,23 @@ public class User
             user.LastName,
             user.Role,
             user.IsActive,
+            user.UserAddress?.UseSameAddressForBilling,
+            shippingAddress = new
+            {
+                City = user.UserAddress?.ShippingCity,
+                Country = user.UserAddress?.ShippingCountry,
+                State = user.UserAddress?.ShippingState,
+                Code = user.UserAddress?.ShippingZipCode,
+                Street = user.UserAddress?.ShippingStreet
+            },
+            billingAddress = new
+            {
+                City = user.UserAddress?.BillingCity,
+                Country = user.UserAddress?.BillingCountry,
+                State = user.UserAddress?.BillingState,
+                Code = user.UserAddress?.BillingZipCode,
+                Street = user.UserAddress?.BillingStreet
+            },
             CreatedAt = user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
             UpdatedAt = user.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
         };
@@ -68,7 +92,7 @@ public class User
 
     public static User ResetPassword(User user, string passwordHash)
     {
-       
+
         user.PasswordHash = passwordHash;
         return user;
     }
