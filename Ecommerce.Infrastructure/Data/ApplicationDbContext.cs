@@ -11,6 +11,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Category> Categories { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<WishList> WishLists { get; set; }
+    public DbSet<UserAddress> UserAddress { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -131,6 +133,53 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasIndex(p => new { p.CategoryId, p.IsActive });
             entity.HasIndex(p => new { p.Featured, p.IsActive });
             entity.HasIndex(p => p.Price);
+        });
+
+        // WishList configuration
+        modelBuilder.Entity<WishList>(entity =>
+        {
+            entity.HasKey(w => w.Id);
+            entity.Property(w => w.Id).ValueGeneratedOnAdd();
+            entity.Property(w => w.IsActive).HasDefaultValue(true);
+            entity.Property(w => w.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(w => w.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
+
+            // Relación N a 1 con Product y User
+            entity.HasOne(w => w.Product)
+                  .WithMany(p => p.WishLists) 
+                  .HasForeignKey(w => w.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(w => w.User)
+              .WithMany(u => u.WishLists)
+              .HasForeignKey(w => w.UserId)
+              .OnDelete(DeleteBehavior.Cascade);
+
+            // Índices
+            entity.HasIndex(w => w.ProductId);
+            entity.HasIndex(w => w.UserId);
+            entity.HasIndex(w => new { w.ProductId, w.UserId })
+                  .IsUnique();
+            entity.HasIndex(w => w.IsActive);
+        });
+
+        // UserAddress configuration
+        modelBuilder.Entity<UserAddress>(entity =>
+        {
+            entity.HasKey(ua => ua.Id);
+            entity.Property(ua => ua.Id).ValueGeneratedOnAdd();
+            entity.Property(ua => ua.UseSameAddressForBilling).HasDefaultValue(false);
+            entity.Property(ua => ua.CreatedAt).IsRequired().HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(ua => ua.UpdatedAt).IsRequired().ValueGeneratedOnAddOrUpdate().HasDefaultValueSql("GETUTCDATE()");
+
+            // Relación 1 a 1 con  User
+            entity.HasOne(ua => ua.User)
+                  .WithOne(u => u.UserAddress)
+                  .HasForeignKey<UserAddress>(ua => ua.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Índices
+            entity.HasIndex(ua => ua.UserId).IsUnique(); 
         });
 
     }

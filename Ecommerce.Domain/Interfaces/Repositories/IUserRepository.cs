@@ -10,5 +10,11 @@ public interface IUserRepository
     Task<PaginationResponse<User>> GetUsersAsync(int pageSize, int pageNumber, string? searchTerm);
     Task AddAsync(User user);
     Task UpdateAsync(User user);
+    Task CreateUserAddressAsync(UserAddress userAddress);
+    Task UpdateUserAddressAsync(UserAddress userAddress);
     Task<bool> ExistsByEmailAsync(string email);
+    Task<List<WishList>> GetWishListByUserIdAsync(int userId);
+    Task AddProductWishListAsync(int productId, int userId);
+
+    
 }

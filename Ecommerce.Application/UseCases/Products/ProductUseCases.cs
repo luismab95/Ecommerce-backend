@@ -19,15 +19,16 @@ public class ProductUseCases(IProductRepository productRepository, IConfiguratio
  
         result.Items.ForEach(product =>
         {
-            safeProductResponse.Add(Product.ToSafeResponse(product));
             if (product != null && product.Images != null)
             {
                 string baseUrl = $"{_config["App:StaticUrl"]}";
+                
                 product.Images.ForEach(image =>
                 {
                     image = Image.UpdatePath(image, baseUrl);
                 });
             }
+            safeProductResponse.Add(Product.ToSafeResponse(product));
         });
 
 

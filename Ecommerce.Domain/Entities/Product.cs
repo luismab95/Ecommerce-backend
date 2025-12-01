@@ -15,6 +15,8 @@ public class Product
     public DateTime UpdatedAt { get; private set; }
 
     public virtual Category? Category { get; set; }
+    public virtual ICollection<WishList>? WishLists { get; private set; }
+
 
     private Product() { }
 

@@ -1,5 +1,6 @@
 ﻿using Ecommerce.Api.Filters;
 using Ecommerce.Application.DTOs.General;
+using Ecommerce.Application.DTOs.Products;
 using Ecommerce.Application.DTOs.Users;
 using Ecommerce.Application.UseCases.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,54 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
         catch (Exception)
         {
             return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor " });
+        }
+    }
+
+
+    [HttpGet("wishlist/{userId}")]
+    public async Task<IActionResult> GetUserWishlist(int userId)
+    {
+        try
+        {
+            var result = await _userUseCase.GetUserWishlistAsync(userId);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+        }
+    }
+
+
+    [HttpPost("wishlist/{userId}")]
+    public async Task<IActionResult> AddProductWishList([FromBody] AddProductWishListRequest request, int userId)
+    {
+        try
+        {
+            var result = await _userUseCase.AddProductWishListAsync(request, userId);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
         }
     }
 
@@ -89,6 +138,33 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
         }
     }
 
+
+    [HttpPut("address/{userId}")]
+    public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserAddressRequest request)
+    {
+        try
+        {
+            var result = await _userUseCase.UpdateUserAddressAsync(userId, request);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+        }
+    }
+
+
+
+
     [HttpPut("role/{userId}")]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
     public async Task<IActionResult> UpdateUserRole(int userId)
@@ -137,5 +213,8 @@ public class UserController(UserUseCases userUseCase) : ControllerBase
             return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
         }
     }
+
+
+
 
 }

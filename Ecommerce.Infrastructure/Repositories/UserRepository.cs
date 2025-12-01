@@ -37,10 +37,12 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         return await query.ToPagedListAsync(pageNumber, pageSize);
     }
 
-  
+
     public async Task<User?> GetByIdAsync(int userId)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
+        return await _context.Users
+            .Include(ua => ua.UserAddress)
+            .FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
     }
 
     public async Task AddAsync(User user)
@@ -58,6 +60,49 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
     public async Task UpdateAsync(User user)
     {
         _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddProductWishListAsync(int productId, int userId)
+    {
+        var findProductInWishlist = await _context.WishLists.FirstOrDefaultAsync(w => w.ProductId == productId && w.UserId == userId);
+        if (findProductInWishlist != null)
+        {
+            //update existing record
+            var updateWishlist = WishList.ToggleStatus(findProductInWishlist);
+            _context.WishLists.Update(updateWishlist);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            //create new record
+            var newWishlist = WishList.Create(productId, userId);
+            await _context.WishLists.AddAsync(newWishlist);
+            await _context.SaveChangesAsync();
+        }
+
+
+    }
+
+    public async Task<List<WishList>> GetWishListByUserIdAsync(int userId)
+    {
+        return await _context.WishLists
+            .Include(w => w.Product)
+                .ThenInclude(p => p.Images)
+            .Where(w => w.IsActive && w.UserId == userId)
+            .OrderBy(w => w.UpdatedAt)
+            .ToListAsync();
+    }
+
+    public async Task CreateUserAddressAsync(UserAddress userAddress)
+    {
+        await _context.UserAddress.AddAsync(userAddress);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateUserAddressAsync(UserAddress userAddress)
+    {
+        _context.UserAddress.Update(userAddress);
         await _context.SaveChangesAsync();
     }
 }
