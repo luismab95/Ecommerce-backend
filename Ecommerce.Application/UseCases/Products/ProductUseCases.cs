@@ -10,7 +10,6 @@ public class ProductUseCases(IProductRepository productRepository, IConfiguratio
     private readonly IProductRepository _productRepository = productRepository;
     private readonly IConfiguration _config = config;
 
-
     public async Task<object> GetProductsAsync(GetProductsWithFiltersRequest request)
     {
         var result = await _productRepository.GetProductsAsync(request.PageSize, request.PageNumber, request.SearchTerm, request.CategoryId, request.PriceMax, request.PriceMin,request.Featured);
@@ -28,7 +27,7 @@ public class ProductUseCases(IProductRepository productRepository, IConfiguratio
                     image = Image.UpdatePath(image, baseUrl);
                 });
             }
-            safeProductResponse.Add(Product.ToSafeResponse(product));
+            safeProductResponse.Add(Product.ToSafeResponse(product!));
         });
 
 

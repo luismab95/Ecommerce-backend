@@ -9,6 +9,7 @@ public class User
 
     public int Id { get; private set; }
     public string Email { get; private set; } = string.Empty;
+    public string Phone { get; private set; } = string.Empty;
     public string PasswordHash { get; private set; } = string.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
@@ -20,6 +21,7 @@ public class User
     public virtual ICollection<WishList>? WishLists { get; private set; }
 
     public virtual ICollection<Session>? Sessions { get; set; }
+    public virtual ICollection<Order> Orders { get; private set; } = new List<Order>();
     public virtual UserAddress? UserAddress { get; private set; }
 
 
@@ -34,27 +36,34 @@ public class User
             FirstName = firstName,
             LastName = lastName,
             Role = "Cliente",
-            IsActive = true
+            Phone = "",
+            IsActive = true,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
         };
     }
 
-    public static User UpdateNames(User user, string firstName, string lastName, string email)
+    public static User Update(User user, string firstName, string lastName, string email,string phone)
     {
         user.FirstName = firstName;
         user.LastName = lastName;
         user.Email = email;
+        user.Phone = phone;
+        user.UpdatedAt = DateTime.Now;  
         return user;
     }
 
     public static User UpdateRole(User user)
     {
         user.Role = user.Role == "Cliente" ? "Administrador" : "Cliente";
+        user.UpdatedAt = DateTime.Now;
         return user;
     }
 
     public static User Delete(User user)
     {
         user.IsActive = false;
+        user.UpdatedAt = DateTime.Now;
         return user;
     }
 
@@ -66,6 +75,7 @@ public class User
             user.Email,
             user.FirstName,
             user.LastName,
+            user.Phone,
             user.Role,
             user.IsActive,
             user.UserAddress?.UseSameAddressForBilling,
@@ -94,6 +104,7 @@ public class User
     {
 
         user.PasswordHash = passwordHash;
+        user.UpdatedAt = DateTime.Now;
         return user;
     }
 

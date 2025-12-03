@@ -1,4 +1,5 @@
-﻿using Ecommerce.Domain.Interfaces.Repositories;
+﻿using Ecommerce.Domain.Entities;
+using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using System.Security.Claims;
 
@@ -18,11 +19,10 @@ namespace Ecommerce.Application.UseCases.Auth
             int sessionId = int.Parse(jwtPayload[ClaimTypes.NameIdentifier].ToString()!);
             var session = await _sessionRepository.GetSessionAsync(sessionId) ??
                 throw new InvalidOperationException("Sesión no encontrada.");
-       
-            session.IsActive = false;
-            session.LogoutAt = DateTime.UtcNow;
-           
-            await _sessionRepository.UpdateAsync(session);
+
+
+            var updatedSession = Session.Update(session);
+            await _sessionRepository.UpdateAsync(updatedSession);
 
             return "La sesión se ha cerrado correctamente.";
         }

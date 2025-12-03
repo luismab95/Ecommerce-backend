@@ -3,13 +3,13 @@
 public class Session
 {
     public int Id { get; private set; }
-    public int UserId { get; set; }
-    public string DeviceInfo { get; set; } = string.Empty;
-    public string IpAddress { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
-    public DateTime LoginAt { get; set; }
-    public DateTime? LogoutAt { get; set; }
-    public bool IsActive { get; set; } = true;
+    public int UserId { get; private set; }
+    public string DeviceInfo { get; private set; } = string.Empty;
+    public string IpAddress { get; private set; } = string.Empty;
+    public string RefreshToken { get; private set; } = string.Empty;
+    public DateTime LoginAt { get; private set; }
+    public DateTime? LogoutAt { get; private set; }
+    public bool IsActive { get; private set; } = true;
 
    
     public virtual User? User { get; set; }
@@ -24,7 +24,15 @@ public class Session
             DeviceInfo = deviceInfo,
             IpAddress = ipAddress,
             RefreshToken = refreshToken,
-            IsActive = isActive
+            IsActive = isActive,
+            LoginAt = DateTime.Now, 
         };
+    }
+
+    public static Session Update(Session session)
+    {
+        session.IsActive = false;
+        session.LogoutAt = DateTime.UtcNow;
+        return session;     
     }
 }

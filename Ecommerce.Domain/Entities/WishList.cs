@@ -21,13 +21,16 @@ public class WishList
         {
             UserId = userId,
             ProductId = productId,
-            IsActive = true
+            IsActive = true,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
         };
     }
 
     public static WishList ToggleStatus(WishList wishList)
     {
         wishList.IsActive = !wishList.IsActive;
+        wishList.UpdatedAt = DateTime.Now;
         return wishList;
     }
 
