@@ -16,6 +16,7 @@ public class Product
 
     public virtual Category? Category { get; set; }
     public virtual ICollection<WishList>? WishLists { get; private set; }
+    public virtual ICollection<OrderItem> OrderItems { get; private set; } = new List<OrderItem>();
 
 
     private Product() { }
@@ -31,10 +32,12 @@ public class Product
             Price = price,
             Featured = featured,
             IsActive = true,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
     }
 
-    public static Product Update(Product product, string name, string description, decimal price, int stock, bool featured,int categoryId)
+    public static Product Update(Product product, string name, string description, decimal price, int stock, bool featured, int categoryId)
     {
         product.Name = name;
         product.Description = description;
@@ -42,12 +45,30 @@ public class Product
         product.Stock = stock;
         product.Featured = featured;
         product.CategoryId = categoryId;
+        product.UpdatedAt = DateTime.Now;
         return product;
     }
+
+
+    public static Product UpdateStock(Product product, int quantity)
+    {
+        product.Stock = product.Stock - quantity;
+        product.UpdatedAt = DateTime.Now;
+        return product;
+    }
+
+    public static Product ReturnStock(Product product, int quantity)
+    {
+        product.Stock = product.Stock + quantity;
+        product.UpdatedAt = DateTime.Now;
+        return product;
+    }
+
 
     public static Product Delete(Product product)
     {
         product.IsActive = false;
+        product.UpdatedAt = DateTime.Now;
         return product;
     }
 

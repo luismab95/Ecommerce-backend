@@ -26,9 +26,9 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         {
             searchTerm = searchTerm.Trim().ToLower();
             query = query.Where(u =>
-                u.FirstName.ToLower().Contains(searchTerm) ||
-                u.LastName.ToLower().Contains(searchTerm) ||
-                u.Email.ToLower().Contains(searchTerm)
+                u.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                u.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                u.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
             );
         }
 

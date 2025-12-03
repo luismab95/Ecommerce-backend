@@ -1,25 +1,30 @@
 ﻿using Ecommerce.Api.Filters;
 using Ecommerce.Application.DTOs.General;
+using Ecommerce.Application.DTOs.Orders;
 using Ecommerce.Application.DTOs.Products;
+using Ecommerce.Application.UseCases.Orders;
 using Ecommerce.Application.UseCases.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
 
+
 [ApiController]
-[Route("api/products")]
-public class ProductController(ProductUseCases productUseCases) : ControllerBase
+[Authorize]
+[ServiceFilter(typeof(PostAuthorizeFilter))]
+[Route("api/orders")]
+public class OrderController(OrderUseCases orderUseCase) : ControllerBase
 {
-    private readonly ProductUseCases _productUseCases = productUseCases;
+    private readonly OrderUseCases _orderUseCase = orderUseCase;
 
 
     [HttpGet("")]
-    public async Task<IActionResult> GetProducts([FromQuery] GetProductsWithFiltersRequest request)
+    public async Task<IActionResult> GetOrders([FromQuery] GetOrdersWithFiltersRequest request)
     {
         try
         {
-            var result = await _productUseCases.GetProductsAsync(request);
+            var result = await _orderUseCase.GetOrdersAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -37,12 +42,12 @@ public class ProductController(ProductUseCases productUseCases) : ControllerBase
         }
     }
 
-    [HttpGet("{productId}")]
-    public async Task<IActionResult> GetProductById(int productId)
+    [HttpGet("{orderId}")]
+    public async Task<IActionResult> GetOrderById(int orderId)
     {
         try
         {
-            var result = await _productUseCases.GetProductByIdAsync(productId);
+            var result = await _orderUseCase.GetOrderByIdAsync(orderId);
 
             return Ok(new GeneralResponse
             {
@@ -62,14 +67,11 @@ public class ProductController(ProductUseCases productUseCases) : ControllerBase
 
 
     [HttpPost("")]
-    [Authorize]
-    [ServiceFilter(typeof(PostAuthorizeFilter))]
-    [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> AddProduct([FromBody] ProductRequest request)
+    public async Task<IActionResult> CreateOrder([FromBody] AddOrderRequest request)
     {
         try
         {
-            var result = await _productUseCases.AddProductAsync(request);
+            var result = await _orderUseCase.AddOrderAsync(request);
 
             return Ok(new GeneralResponse
             {
@@ -83,46 +85,19 @@ public class ProductController(ProductUseCases productUseCases) : ControllerBase
         }
         catch (Exception)
         {
-            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor"});
         }
-    }
 
-    [HttpPut("{productId}")]
-    [Authorize]
-    [ServiceFilter(typeof(PostAuthorizeFilter))]
-    [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductRequest request)
-    {
-        try
-        {
-            var result = await _productUseCases.UpdateProductAsync(productId, request);
-
-            return Ok(new GeneralResponse
-            {
-                Data = result,
-                Message = "Proceso realizado con éxito."
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new GeneralResponse { Message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
-        }
     }
 
 
-    [HttpDelete("{productId}")]
-    [Authorize]
-    [ServiceFilter(typeof(PostAuthorizeFilter))]
+    [HttpPut("{orderId}")]
     [ServiceFilter(typeof(PostAuthorizeRoleFilter))]
-    public async Task<IActionResult> DeleteProduct(int productId)
+    public async Task<IActionResult> UpdateOrderStaus([FromBody] UpdateOrderRequest request, int orderId)
     {
         try
         {
-            var result = await _productUseCases.DeleteProductAsync(productId);
+            var result = await _orderUseCase.UpdateOrderStatusAsync(request,orderId);
 
             return Ok(new GeneralResponse
             {
@@ -141,5 +116,27 @@ public class ProductController(ProductUseCases productUseCases) : ControllerBase
     }
 
 
+    [HttpDelete("{orderId}")]
+    public async Task<IActionResult> CancelOrder(int orderId)
+    {
+        try
+        {
+            var result = await _orderUseCase.CancelOrderAsync(orderId);
+
+            return Ok(new GeneralResponse
+            {
+                Data = result,
+                Message = "Proceso realizado con éxito."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new GeneralResponse { Message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new GeneralResponse { Message = "Error interno del servidor" });
+        }
+    }
 
 }

@@ -45,7 +45,9 @@ public class UserAddress
             BillingState = billingState,
             BillingCountry = billingCountry,
             BillingZipCode = billingZipCode,
-            UseSameAddressForBilling = false
+            UseSameAddressForBilling = false,
+            CreatedAt = DateTime.UtcNow, 
+            UpdatedAt = DateTime.UtcNow
         };
 
         if (userAddress.AreAddressesEqual())
@@ -77,6 +79,7 @@ public class UserAddress
         userAddress.BillingCountry = billingCountry;
         userAddress.BillingZipCode = billingZipCode;
         userAddress.UseSameAddressForBilling = false;
+        userAddress.UpdatedAt = DateTime.UtcNow;
         
 
         if (userAddress.AreAddressesEqual())

@@ -21,13 +21,16 @@ public class Image
         {
             Path = path,
             ProductId = productId,
-            IsActive = true
+            IsActive = true,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
         };
     }
 
     public static Image UpdatePath(Image image, string baseUrl)
     {
         image.Path = baseUrl + image.Path;
+        image.UpdatedAt = DateTime.Now;
         return image;
 
     }
@@ -36,6 +39,7 @@ public class Image
     public static Image Delete(Image image)
     {
         image.IsActive = false;
+        image.UpdatedAt = DateTime.Now;
         return image;
     }
 

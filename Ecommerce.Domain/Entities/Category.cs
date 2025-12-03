@@ -19,7 +19,9 @@ public class Category
         {
             Name = name,
             Description = description,
-            IsActive = true
+            IsActive = true,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
         };
     }
 
@@ -40,6 +42,7 @@ public class Category
     {
         category.Name = name;
         category.Description = description;
+        category.UpdatedAt = DateTime.Now;
         return category;
     }
 
@@ -47,6 +50,7 @@ public class Category
     public static Category Delete(Category category)
     {
         category.IsActive = false;
+        category.UpdatedAt = DateTime.Now;
         return category;
     }
 

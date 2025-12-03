@@ -14,6 +14,7 @@ using Ecommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.Application.UseCases.Products;
 using Microsoft.OpenApi.Models;
+using Ecommerce.Application.UseCases.Orders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, JwtAuthService>();
@@ -71,6 +73,7 @@ builder.Services.AddScoped<UserUseCases>();
 builder.Services.AddScoped<CategoryUseCases>();
 builder.Services.AddScoped<ImageUseCases>();
 builder.Services.AddScoped<ProductUseCases>();
+builder.Services.AddScoped<OrderUseCases>();
 
 
 // Filters
