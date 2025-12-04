@@ -67,7 +67,7 @@ public class OrderUseCases(IOrderRepository orderRepository, IConfiguration conf
         var updatedOrder = OrderStatus.SetStatus(findOrden.OrderStatus!, request.Status);
         await _orderRepository.UpdateAsync(updatedOrder);
 
-        return "Orden actualzida exitosamente.";
+        return "Orden actualizada exitosamente.";
 
     }
 

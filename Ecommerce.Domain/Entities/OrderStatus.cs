@@ -33,9 +33,15 @@ public class OrderStatus
         return orderStatus;
     }
 
-    public static OrderStatus SetStatus(OrderStatus orderStatus, OrderStatusType status)
+    public static OrderStatus SetStatus(OrderStatus orderStatus, string status)
     {
-        orderStatus.Status = status;
+
+        if (!Enum.TryParse<OrderStatusType>(status, true, out var statusEnum))
+        {
+            throw new ArgumentException($"Invalid status: {status}");
+        }
+
+        orderStatus.Status = statusEnum;
         orderStatus.UpdatedAt = DateTime.UtcNow;
         return orderStatus;
     }

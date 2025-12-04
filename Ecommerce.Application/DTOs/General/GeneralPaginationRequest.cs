@@ -13,7 +13,6 @@ public class GeneralPaginationRequest
     public int PageNumber { get; set; } = 1;
     
     [StringLength(50, MinimumLength = 2, ErrorMessage = "El Término de busqueda debe tener entre 2 y 50 caracteres")]
-    [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "El nombre solo puede contener letras y espacios")]
     public string? SearchTerm { get; set; }
 
     

@@ -104,6 +104,7 @@ public class OrderRepository(ApplicationDbContext context) : IOrderRepository
         var query = _context.Orders
             .Include(o => o.OrderStatus)
             .Include(o => o.OrderItems)
+            .Include(o => o.User)
             .AsQueryable();
 
         // Filtrar por userId solo si no es nulo
@@ -117,7 +118,7 @@ public class OrderRepository(ApplicationDbContext context) : IOrderRepository
         {
             searchTerm = searchTerm.Trim().ToLower();
             query = query.Where(o =>
-                o.OrderNumber.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                o.OrderNumber.ToLower().Contains(searchTerm)
             );
         }
 

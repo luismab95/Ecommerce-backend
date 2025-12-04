@@ -38,8 +38,8 @@ public class CategoryRepository(ApplicationDbContext context) : ICategoryReposit
         {
             searchTerm = searchTerm.Trim().ToLower();
             query = query.Where(c =>
-                c.Name.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                c.Description.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                 c.Name.ToLower().Contains(searchTerm) ||
+                 c.Description.ToLower().Contains(searchTerm)
             );
         }
 

@@ -39,8 +39,8 @@ public class ProductRepository(ApplicationDbContext context) : IProductRepositor
         {
             searchTerm = searchTerm.Trim().ToLower();
             query = query.Where(p =>
-                p.Name.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                p.Description.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                 p.Name.ToLower().Contains(searchTerm) ||
+                 p.Description.ToLower().Contains(searchTerm)
             );
         }
 
