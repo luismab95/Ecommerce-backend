@@ -5,10 +5,13 @@ using Ecommerce.Domain.Interfaces.Repositories;
 using Ecommerce.Domain.Interfaces.Services;
 using Ecommerce.Infrastructure.Repositories;
 using Ecommerce.Infrastructure.Services;
+using Ecommerce.Infrastructure.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Serilog;
 
 namespace Ecommerce.Infrastructure;
 
@@ -25,7 +28,6 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
-
 
         // Repositorios
         services.AddScoped<IUserRepository, UserRepository>();
@@ -54,6 +56,35 @@ public static class DependencyInjection
                 app.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
             });
         });
+
+        // Health Checks
+        services.AddSingleton<DatabaseMetrics>();
+        services.AddHostedService<DatabaseMetricsCollector>();
+
+        services.AddHealthChecks()
+            .AddSqlServer(
+                connectionString: connectionString!,
+                healthQuery: "SELECT 1;",
+                name: "sqlServer",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "database", "sqlserver" })
+            .AddCheck<DatabaseHealthCheck>(
+                "databaseContext",
+                failureStatus: HealthStatus.Unhealthy,
+                tags: new[] { "database", "metrics", "context" })
+            .AddCheck<MemoryHealthCheck>(
+                "memory",
+                failureStatus: HealthStatus.Degraded,
+                tags: new[] { "system", "memory" });
+
+
+        // Serilog
+        host.UseSerilog((context, services, logConfg) =>
+        {
+            logConfg
+                .ReadFrom.Configuration(context.Configuration);
+        });
+
 
         return services;
     }
