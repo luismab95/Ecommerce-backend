@@ -11,6 +11,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
 using Serilog;
 
 namespace Ecommerce.Infrastructure;
@@ -85,6 +90,72 @@ public static class DependencyInjection
                 .ReadFrom.Configuration(context.Configuration);
         });
 
+
+        // OpenTelemetry
+        // OrderUseCases
+        services.AddOpenTelemetry()
+         .ConfigureResource(resource => resource.AddService("OrderUseCases"))
+         .WithTracing(tracing =>
+         {
+             var jaegerUri = configuration["Jaeger:Uri"] ?? "";
+             tracing
+                 .AddSource("OrderUseCases")
+                 .AddAspNetCoreInstrumentation(options =>
+                 {
+                     options.RecordException = true;
+                     options.EnrichWithHttpRequest = (activity, request) =>
+                     {
+                         activity.SetTag("http.request.method", request.Method);
+                         activity.SetTag("http.client_ip", request.HttpContext.Connection.RemoteIpAddress?.ToString());
+                         activity.SetTag("http.request.content_length", request.ContentLength);
+                     };
+                     options.EnrichWithHttpResponse = (activity, response) =>
+                     {
+                         activity.SetTag("http.response.status_code", response.StatusCode);
+                         activity.SetTag("http.response.content_length", response.ContentLength);
+                     };
+
+                     // Excluir swagger y health
+                     options.Filter = context =>
+                         !context.Request.Path.Value!.Contains("swagger", StringComparison.OrdinalIgnoreCase) &&
+                         !context.Request.Path.Value.Contains("health", StringComparison.OrdinalIgnoreCase);
+                 })
+                 .AddHttpClientInstrumentation(options =>
+                 {
+                     options.RecordException = true;
+                     options.EnrichWithHttpRequestMessage = (activity, request) =>
+                     {
+                         activity.SetTag("http.request.method", request.Method.Method);
+                         activity.SetTag("http.request.url", request.RequestUri?.ToString());
+                     };
+                 })
+                 .AddSqlClientInstrumentation(options =>
+                 {
+                     options.RecordException = true;
+                 })
+                 .AddOtlpExporter(otlp =>
+                 {
+                     otlp.Endpoint = new Uri(jaegerUri);
+                     otlp.Protocol = OtlpExportProtocol.Grpc;
+                     otlp.ExportProcessorType = ExportProcessorType.Batch;
+                     otlp.BatchExportProcessorOptions = new()
+                     {
+                         MaxQueueSize = 2048,
+                         ScheduledDelayMilliseconds = 3000,
+                         ExporterTimeoutMilliseconds = 10000,
+                         MaxExportBatchSize = 256
+                     };
+                 });
+         })
+         .WithMetrics(metrics =>
+         {
+             metrics
+                 .AddMeter("OrderUseCases")
+                 .AddAspNetCoreInstrumentation()
+                 .AddHttpClientInstrumentation()
+                 .AddRuntimeInstrumentation()
+                 .AddProcessInstrumentation();
+         });
 
         return services;
     }
